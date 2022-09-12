@@ -397,12 +397,169 @@ fn(10, 10, 20)
 ## 三、知识深度 - 原理和源码
 
   #### JS内存垃圾回收用什么算法
-  #### 【连环问】JS闭包是内存泄漏吗
-  #### 如何检测JS内存泄漏
+
+> 什么是垃圾回收？函数执行完了后，那些用不到的对象和数据
+>
+> 什么是内存泄露？非预期的数据，垃圾回收不了
+
+* 引用计数法（之前）
+  * 看自己有没有被引用，缺陷是循环引用清除不了
+* 标记消除法（现在）
+  * 从根(window)上开始遍历，看能不能得到它，得不到，就清除
+
+```js
+// 引用计数------------------------------------
+let obj = { a: 100 } // 对象被obj引用1次
+let a1 = obj;// 对象被obj和a1各引用1次
+obj = '' // 对象被a1引用1次
+a1 = null // 对象没有被任何变量引用
+
+// 缺陷
+function fn() {
+  const a = {}
+  const b = {}
+  b.a = a
+  a.b = b
+}
+fn();// 执行完后a和b一直被引用，没法清除
+// 标记清除-------------------------------------
+function fn2() {
+  const a = {}
+  const b = {}
+  b.a = a
+  a.b = b
+}
+fn2();// 执行完后从window开始找，a和b两个变量被消除了，所以跟在后面的{}也找不到了
+```
+
+  #### JS闭包是内存泄漏吗？
+
+* 闭包不是内存泄漏，因为闭包里面的数据是要用的，属于预期数据，非预期的数据(不需要用的)才算内存泄露
+* 闭包里的数据不能被回收（但不代表它是内存泄露，只不过占内存而已）
+
+  #### 如何检测JS内存泄漏？
+
+* 使用浏览器中的`Performance`, 勾选`Memory`,按左上角record（黑色圆点），点击stop，查看堆(HEAP)的变化，正常状态是锯齿状(创建后销毁)，一开始高，然后垃圾回收后变低；而内存泄漏会一直变高，堆(HEAP)里越来越多
+
   #### JS内存泄漏的场景有哪些
-  #### JS内存泄漏的场景有哪些-扩展-WeakMap和WeakSet
-  #### 浏览器和nodejs事件循环（Event Loop）有什么区别浏览器
-  #### 浏览器和nodejs事件循环（Event Loop）有什么区别nodejs
+
+* vue
+  * 被全局变量、函数引用，组件销毁时未清除
+  * 被全局事件、定时器引用，组件销毁时未清除 
+  * 被自定义事件引用，组件销消毁时未清除
+
+```vue
+<script>
+  export default {
+    name: 'Memory Leak Demo',
+    data() {
+      return {
+        arr: [1, 2, 3],
+        intervalId: 0
+      }
+    },
+    methods: {
+      printArr() {
+        console.log(this.arr);
+      }
+    },
+    mounted() {
+      // 被全局变量引用
+      window.arr = this.arr;
+      // 被全局函数引用
+      window.printArr = () => {
+        console.log(this.arr)
+      }
+      // 被全局事件引用(回调函数提到methods，不能直接把匿名函数塞进去，因为到时候需要把同个函数塞进removeEventListener)
+      window.addEventListener('resize', this.printArr)
+      // 被全局定时器引用
+      this.intervalId = setInterval(() => {
+        console.log(this.arr);
+      }, 100);
+    },
+    // 在 beforeDestroy 或 beforeUnmount中清楚，否则会一直挂在全局window上
+    beforeUnmount() {
+      window.arr = null;
+      window.printArr = null;
+      window.removeEventListener('resize', this.printArr);
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
+    }
+  }
+</script>
+```
+
+
+
+  #### WeakMap和WeakSet
+
+* 弱引用的关系，我引用你，但是如果你销毁了，我也一样找不到
+* 不影响垃圾回收，只要外部的引用消失，所对应的键值对就会自动被垃圾回收清除
+* 使用场景：
+  * 关联dom的元数据，节点从DOM树中被删除了，引用解除
+  * 自己写的深拷贝函数，数据缓存，又不想管理缓存
+  * 部署私有属性（实例销毁，引用解除）
+
+```js
+const map = new Map()
+function fn1() {
+  const obj = { x: 100 } // 执行结束后，对象{x: 100}会被留着，因为外面的Map引用着
+  map.set('a', obj);
+}
+fn1();
+console.log(map.get('a')); // {x: 100}，就是刚刚的那个对象
+
+const wMap = new WeakMap()// 弱引用 
+function fn2() {
+  const obj = { x: 100 } // 执行结束了，这个对象会被销毁，外部的是弱引用
+  wMap.set(obj, 100)// weakMap 的 key只能是引用类型
+}
+fn2();
+console.log(wMap.get({ x: 100 })); // undefined, 这里的{ x: 100 }已经不是刚才set进去的那个了，key都找不到了
+```
+
+
+
+  #### 浏览器和nodejs事件循环（Event Loop）有什么区别？
+
+> 两者基本上是相同的，只不过nodejs给宏任务和微任务分了不同的类型和优先级，而浏览器的宏任务微任务没有优先级
+
+* **浏览器的Event Loop**（执行宏任务后，先清空微任务队列，再渲染，然后从宏任务队列取出一个，重复操作）
+  * 从`<script>`标签(也算一个宏任务)开始同步执行函数，当遇到宏任务(如`setTimeOut`)则先推进宏任务队列，当遇到微任务(如`Promise`的then)，则推进微任务队列
+  * 当前宏任务执行结束，查看微任务队列是否有待执行的，有，则一个个执行直至清空，然后执行渲染；
+  * 当微任务队列清空后，查看宏任务队列是否有待执行的，有，则取出一个宏任务，执行，执行过程中，如果有遇到其他宏任务或微任务，按上述操作继续推进宏任务队列或微任务队列
+* **nodejs的Event Loop**(分不同的类型，不同的优先级来执行)
+  * 先执行同步代码
+  * 执行微任务（其中process.nextTick优先级更高，队列中放在普通微任务前面）
+  * 按类型执行6个类型的宏任务
+    1. timer：`setTimerOut`和`setInterval`
+    2. I/0 callback:  处理网络，流，TCP的错误回调
+    3. Idle prepare：闲置状态（nodejs内部使用）
+    4. Poll轮询：执行Poll中的I/O队列
+    5. check检查：存储`setImmediate`回调
+    6. close callbacks:  关闭回调，如`socket.on('close')`
+
+```js
+console.info('start') // 1
+setImmediate(() => {
+	console.info('setImmediate') // 6
+})
+setTimeout(() => {
+	console.info('timeout') // 5
+})
+Promise.resolve().then(() => {
+	console.info('promise then') // 4
+})
+process.nextTick(() => {
+	console.info('nextTick') // 3
+})I
+console.info('end') // 2
+// nodejs的执行顺序['start','end','nextTick','promise then','timeout','setImmediate']
+```
+
+
+
   #### 虚拟DOM（vdom）真的很快吗
   #### 遍历一个数组用for和forEach哪个更快
   #### nodejs如何开启多进程，进程如何通讯-进程和线程的区别
