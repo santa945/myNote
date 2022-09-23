@@ -344,7 +344,8 @@ const createPromise = (val) => {
 * watch是监听现有数据的变化，来判断要做什么事（一个数据影响多个）
 * computed和method相比，computed是有缓存的，影响因素不变就不会重新计算，method是触发就重新计算
 
-  #### 4-15-18 Vue组件通讯有几种方式
+
+  #### Vue组件通讯有几种方式
 
 * props/$emits自定义事件
 * $attrs/$parents
@@ -353,10 +354,12 @@ const createPromise = (val) => {
 * eventbus
 * Vuex
 
+
   #### Vuex中action和mutation有什么区别
 
 * Mutation: 原子操作，必须是同步的代码
 * Action: 可包含异步操作，可以包含多个mutation
+
 
   #### JS严格模式有什么特点
 
@@ -385,8 +388,6 @@ function fn(x, x, y) { // Duplicate parameter name not allowed in this context
 }
 fn(10, 10, 20)
 ```
-
-
 
   #### HTTP跨域时为何要发送options请求
 
@@ -437,11 +438,12 @@ fn2();// 执行完后从window开始找，a和b两个变量被消除了，所以
 * 闭包不是内存泄漏，因为闭包里面的数据是要用的，属于预期数据，非预期的数据(不需要用的)才算内存泄露
 * 闭包里的数据不能被回收（但不代表它是内存泄露，只不过占内存而已）
 
-  #### 如何检测JS内存泄漏？
+
+##### 如何检测JS内存泄漏？
 
 * 使用浏览器中的`Performance`, 勾选`Memory`,按左上角record（黑色圆点），点击stop，查看堆(HEAP)的变化，正常状态是锯齿状(创建后销毁)，一开始高，然后垃圾回收后变低；而内存泄漏会一直变高，堆(HEAP)里越来越多
 
-  #### JS内存泄漏的场景有哪些
+##### JS内存泄漏的场景有哪些
 
 * vue
   * 被全局变量、函数引用，组件销毁时未清除
@@ -561,39 +563,179 @@ console.info('end') // 2
 
 
   #### 虚拟DOM（vdom）真的很快吗
-  #### 遍历一个数组用for和forEach哪个更快
-  #### nodejs如何开启多进程，进程如何通讯-进程和线程的区别
-  #### nodejs如何开启多进程，进程如何通讯-使用child_process.fork方式
-  #### nodejs如何开启多进程，进程如何通讯-使用cluster方式
+
+* vdom并不快，JS直接操作 DOM才是最快的 
+* 但“数据驱动视图”要有合适的技术方案，不能全部DOM重建，diff算法会部分dom重建，在整个开发链条来说很快
+* vdom就是目前最合适的技术方案(并不是因为它快，而是合适)
+
+  #### 遍历一个数组用for和forEach哪个更快(JS底层原理问题)
+
+* for会比forEach更快
+* forEach每次都要创建一个函数来调用，而for不会创建函数
+* 函数会有独立的作用域，会有额外的开销
+
+```js
+const arr = []
+for (let i = 0; i<100 * 10000; i++) {
+	arr.push(i)
+}
+const length =arr.length;
+
+console.time('for) let n1 =0
+for (let i = 0; i<length; i++) {
+	n1++
+}
+console.timeEnd(for)//3.7ms
+
+console.time('forEach') 
+let n2 =0
+arr.forEach(() => n2++) I 
+console.timeEnd("forEach)//15.1ms
+```
+
+  #### nodejs如何开启多进程，进程如何通讯
+
+  ##### 进程和线程的区别
+
+* 进程(process)，OS进行**资源分配**和调度的最小单位，有独立内存空间（计算机会分配一个堆）
+  * 例如：一个抖音的进程，一个微信的进程，两个进程的内存中的堆和栈不共用
+  * 默认独立，想要交换数据，就得想办法通讯
+* 线程(thread)，OS进行**运算调度**的最小单位，共享进程内存空间
+  * 例如：同一个资源做并发的计算
+* js是单线程的，但是可以开启多进程执行，如WebWorker
+  * 什么叫单线程呢，就是一个进程里(js进程)里只有一个线程来计算
+  * 假设js是进程p4，里面只有一个线程t1，现在使用WebWorker来开启多进程，实际上是开启了进程p5，里面还是只有一个线程t1，此时进行进程间的通讯，这就是js线程开启多进程的一个说法
+* 扩展：java，c++是多线程的，所以在单例模式中需要考虑线程之间的互斥，而js就不需要考虑这么多
+
+##### 为什么要开启多进程
+
+* 现在的cpu大多是多核的，很适合处理多进程
+
+* 单进程有内存上限（通常2G）
+* 多进程内存更大，可以更好利用计算机的内存
+
+##### nodejs如何开启多进程
+
+* 使用child_process.fork方式
+
+```js
+// process-fork.js 主进程
+const http = require('http')
+const fork = require('child_process').fork
+
+const server = http.createServer((req, res) => {
+    if (req.url === '/get-sum') {
+        console.info('主进程 id', process.pid)
+
+        // 开启子进程
+        const computeProcess = fork('./compute.js')
+        computeProcess.send('开始计算')
+
+        computeProcess.on('message', data => {
+            console.info('主进程接受到的信息：', data)
+            res.end('sum is ' + data)
+        })
+
+        computeProcess.on('close', () => {
+            console.info('子进程因报错而退出')
+            computeProcess.kill()
+            res.end('error')
+        })
+    }
+})
+server.listen(3000, () => {
+    console.info('localhost: 3000')
+})
+
+// compute.js 计算进程--------------------------------------------------
+function getSum() {
+    let sum = 0
+    for (let i = 0; i < 10000; i++) {
+        sum += i
+    }
+    return sum
+}
+
+process.on('message', data => {
+    console.log('子进程 id', process.pid)
+    console.log('子进程接受到的信息: ', data)
+
+    const sum = getSum()
+
+    // 发送消息给主进程
+    process.send(sum)
+})
+```
+
+  * 使用cluster.fork方式（集群）
+
+```js
+const http = require('http')
+const cpuCoreLength = require('os').cpus().length
+const cluster = require('cluster')
+
+if (cluster.isMaster) {
+    for (let i = 0; i < cpuCoreLength; i++) {
+        cluster.fork() // 开启子进程
+    }
+
+    cluster.on('exit', worker => {
+        console.log('子进程退出')
+        cluster.fork() // 进程守护
+    })
+} else {
+    // 多个子进程会共享一个 TCP 连接，提供一份网络服务
+    const server = http.createServer((req, res) => {
+        res.writeHead(200)
+        res.end('done')
+    })
+    server.listen(3000)
+}
+```
+
+
+
   #### 请描述js-bridge的实现原理
+
+##### 什么是 JS Bridge
+
+* JS 无法直接调用nativeAPI
+* 需要通过一些特定的“格式”来调用
+* 这些“格式”就统称JS-Bridge，例如: 微信JSSDK
+
+##### 实现方式
+
+* 注册全局API：不适合异步
+* URL Scheme：制造一个协议标准，参考【微信Scheme】
+  * 例如：`chrome://version/` 可以直接查看版本
+  * 例如：`chrome://dino/`可以玩一个chrome小游戏
+
   #### requestIdleCallback和requestAnimationFrame有什么区别
   #### Vue每个生命周期都做了什么
   #### Vue2和Vue3和React三者的diff 算法有什么区别
   #### Vue-router的MemoryHistory是什么
-  #### 重点及注意事项总结
-
 ## 四、知识广度 - 从前端到全栈
 
   #### 移动端H5点击有300ms延迟，该如何解决
   #### 扩展：Retina 屏幕的 1px 像素，如何实现
   #### HTTP请求中token和cookie有什么区别-cookie和session
   #### HTTP请求中token和cookie有什么区别-token和JWT
-  #### 【连环问】session和JWT哪个更好
-  #### 【连环问】如何实现SSO单点登录
+  #### session和JWT哪个更好
+  #### 如何实现SSO单点登录
   #### HTTP协议和UDP协议有什么区别
-  #### 【连环问】HTTP协议1.0和1.1和2.0有什么区别
+  #### HTTP协议1.0和1.1和2.0有什么区别
   #### 什么是HTTPS中间人攻击，如何预防
   #### script标签的defer和async有什么区别
-  #### 【连环问】prefetch和dns-prefetch分别是什么
+  #### prefetch和dns-prefetch分别是什么
   #### 前端攻击手段有哪些，该如何预防-part1
   #### 前端攻击手段有哪些，该如何预防-part2
   #### WebSocket和HTTP协议有什么区别
   #### WebSocket和HTTP协议有什么区别-扩展-创建简易聊天室
-  #### 【连环问】WebSocket和HTTP长轮询的区别
+  #### WebSocket和HTTP长轮询的区别
   #### 从输入URL 到网页显示的完整过程
-  #### 【连环问】网页重绘repaint和重排reflow有什么区别
+  #### 网页重绘repaint和重排reflow有什么区别
   #### 如何实现网页多标签tab通讯
-  #### 【连环问】如何实现网页和iframe之间的通讯
+  #### 如何实现网页和iframe之间的通讯
   #### 请描述koa2的洋葱圈模型
   #### 扩展：后端有了 java php python ，为何还需要 nodejs ？
   #### 重点及注意事项总结
@@ -604,53 +746,49 @@ console.info('end') // 2
   #### 后端一次性返回10w条数据，你该如何渲染
   #### 扩展：文字超出省略
   #### 前端常用的设计模式和使用场景
-  #### 【连环问】观察者模式和发布订阅模式的区别
+  #### 观察者模式和发布订阅模式的区别
   #### 在实际工作中，你对Vue做过哪些优化
-  #### 【连环问】你在使用Vue过程中遇到过哪些坑
+  #### 你在使用Vue过程中遇到过哪些坑
   #### 在实际工作中，你对React做过哪些优化-上集
   #### 在实际工作中，你对React做过哪些优化-下集
-  #### 【连环问】你在使用React时遇到过哪些坑
+  #### 你在使用React时遇到过哪些坑
   #### 如何统一监听Vue组件报错
   #### 如何统一监听React组件报错
   #### 如果一个H5很慢，如何排查性能问题-通过Chrome Performance分析
   #### 如果一个H5很慢，如何排查性能问题-使用lighthouse分析
   #### 工作中遇到过哪些项目难点，是如何解决的
   #### 扩展：处理沟通冲突
-  #### 重点及注意事项总结
-
 ## 六、编写高质量代码 - 正确，完整，清晰，鲁棒
 
   #### 手写一个JS函数，实现数组扁平化Array Flatten
-  #### 【连环问】手写一个JS函数，实现数组深度扁平化
+  #### 手写一个JS函数，实现数组深度扁平化
   #### 手写一个getType函数，获取详细的数据类型
   #### new一个对象的过程是什么，手写代码表示
   #### 深度优先遍历一个DOM树
   #### 广度优先遍历一个DOM树
-  #### 【连环问】深度优先遍历可以不用递归吗
+  #### 深度优先遍历可以不用递归吗
   #### 手写一个LazyMan，实现sleep机制
   #### 手写curry函数，实现函数柯里化
   #### instanceof原理是什么，请写代码表示
   #### 手写函数bind功能
-  #### 【连环问】手写函数call和apply功能
+  #### 手写函数call和apply功能
   #### 手写EventBus自定义事件-包括on和once
   #### 手写EventBus自定义事件-on和once分开存储
   #### 手写EventBus自定义事件-单元测试
   #### 用JS实现一个LRU缓存-分析数据结构特点，使用Map
   #### 用JS实现一个LRU缓存-代码演示和单元测试
-  #### 【连环问】不用Map实现LRU缓存-分析问题，使用双向链表
-  #### 【连环问】不用Map实现LRU缓存-代码演示
+  #### 不用Map实现LRU缓存-分析问题，使用双向链表
+  #### 不用Map实现LRU缓存-代码演示
   #### 手写JS深拷贝-考虑各种数据类型和循环引用
   #### 扩展补充：根据一个 DOM 树，写出一个虚拟 DOM 对象
   #### 重点及注意事项总结
 
 ## 七、分析和解决问题的思路 - 可以独立解决问题
 
-
-
   #### [1, 2, 3].map(parseInt)
   #### 读代码-函数修改形参，能否影响实参？
   #### 把一个数组转换为树
-  #### 【连环问】把一个树转换为数组
+  #### 把一个树转换为数组
   #### 读代码-构造函数和原型的重名属性
   #### 一道让人失眠的promise-then执行顺序问题
   #### 读代码-React-setState经典面试题
@@ -665,7 +803,7 @@ console.info('end') // 2
   #### 扩展：如果你是一个项目的前端技术负责人，你的主要职责是什么？
   #### 如何设计一个前端统计SDK-分析功能范围
   #### 如何设计一个前端统计SDK-代码结构演示
-  #### 【连环问】sourcemap有何作用，如何配置
+  #### sourcemap有何作用，如何配置
   #### SPA和MPA应该如何选择
   #### 设计一个H5编辑器的数据模型和核心功能-错误答案展示
   #### 扩展知识补充：何时应该使用 SSR ，何时不用？
