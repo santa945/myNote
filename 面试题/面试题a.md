@@ -766,16 +766,112 @@ mounted() {
 
   #### Vue2和Vue3和React三者的diff 算法有什么区别
 
+* React diff：仅右移
+* Vue2 diff：双端比较（头头，头尾，尾尾，尾头，四个指针比较，然后不断往中间移动直到相遇）
+* Vue3 diff：最长递增子系列（例如: [3,5,7,1,2,8]的最长递增子系列为[3,5,7,8])，所以就是中间那块最长不变，其他的改变
 
+#### Vue和React为何循环时必须使用key
+
+* vdom diff算法会根据key判断是否要删除
+* 匹配了key，只移动元素，性能较好
+* 未匹配key，则要删除重建，性能较差
 
   #### Vue-router的MemoryHistory是什么
+
+##### Vue-router是三种模式
+
+* Hash: 基于location.hash 来实现
+  * url中有“#”号
+  * hash值（“#”后的值）不会被包含在http请求中，改变hash值不会引起页面的重新加载。
+  * hash改变会触发hashChange事件，会被浏览器记录下来，可以使用浏览器的前进和后退。
+  * hash兼容到IE8以上
+  * 会创建hashHistory对象，在访问不同的路由的时候,会发⽣两件事
+    * HashHistory.push()将新的路由添加到浏览器访问的历史的栈顶
+    * HasHistory.replace()替换到当前栈
+* WebHistory：HTML5 提供了 History API 来实现 URL 的变化（history.pushState() 和 history.repalceState()）
+  * url不带参数
+  * history 兼容 IE10 以上
+  * history 模式改变地址栏会重新发送请求引起页面重新加载
+* MemoryHistory (Vue Router V4之前叫做 abstract history)： 地址栏什么都没有(使用localstorage存储)，适合非浏览器如app
+
 ## 四、知识广度 - 从前端到全栈
 
-  #### 移动端H5点击有300ms延迟，该如何解决
-  #### 扩展：Retina 屏幕的 1px 像素，如何实现
-  #### HTTP请求中token和cookie有什么区别-cookie和session
-  #### HTTP请求中token和cookie有什么区别-token和JWT
+  #### 移动端H5点击Click有300ms延迟，该如何解决
+
+> 背景：用手机打开网页，发现文字太小了，可以双击放大，这时候点击第一次的时候不执行，等300ms之内如果有第二次点击，证明这是一次双击
+
+* 初期解决方式：使用FastClick第三方库
+
+  * 原理：监听`touchend`s事件，`touchstart`和`touchend`会优于click触发，这样在300ms到来之前就触发了，然后使用自定义DOM事件模拟click事件，把默认的click事件(会延迟300ms)给禁止掉
+
+* 现代浏览器的改进：使用`viewport`配置`width=device-width`
+
+  * width=device-width ：表示宽度是设备屏幕的宽度
+
+  ```html
+  /!-- 有了这个，手机就会认为你已经做了300ms延迟的适应 --/
+  <meta name="viewport" content="width=device-width">
+  ```
+
+   
+
+  #### Retina 屏幕的 1px 像素，如何实现
+
+> https://blog.csdn.net/sisteran/article/details/119529729
+
+| 方案                   | 优点                   | 缺点                     |
+| ---------------------- | ---------------------- | ------------------------ |
+| 0.5px实现              | 代码简单，使用css即可  | IOS及Android老设备不支持 |
+| border-image实现       | 兼容目前所有机型       | 修改颜色不方便           |
+| viewport + rem 实现    | 一套代码，所有页面     | IOS及Android老设备不支持 |
+| 伪元素 + transform实现 | 兼容所有机型           | 不支持圆角               |
+| svg 实现               | 实现简单，可以实现圆角 | 需要学习 svg 语法        |
+
+
+
+  #### HTTP请求中token和cookie有什么区别
+
+##### cookie
+
+* HTTP是无状态的，每次请求都要携带cookie，以帮助识别身份
+* 服务端可以向客户端`set-cookie`· ，大小限制为4kb
+* 默认有跨域限制，cookie不能跨域共享或跨域传递
+  * 共享：同个页面里iframe一个网页，cookie不能共享
+  * 传递：8081端口的网页请求8083的接口时，不会携带cookie给服务端（解决方法：前端在axios配置**withCredentails**，后端也需要配置）
+* 现代浏览器开始禁止第三方js设置cookie（内嵌广告a.com如果可以设置cookie，那下次用户登陆a.com就可以用cookie分析用户习惯了）
+
+  ##### session
+
+* 存储在服务端，存储用户详细信息，和cookie信息一一对应
+* cookie+seccion是常见的登录验证解决方案
+
+##### token（JWT）
+
+* 前端发起登录，后端验证成功之后，返回一个加密的token
+* 前端自行存储这个token (其中包含了用户信息，加密了) 
+* 以后访问服务端接口，都带着这个token，作为用户信息，由后端解密
+
+##### 区别
+
+* cookie是HTTP标准，有跨域限制，需要配合session使用，cookie只存了一个key，体积小，真实信息存在服务端的session里
+* token无标准，无跨域限制，包含用户的全部信息，直接发给服务端全部信息，由服务端解密
+
   #### session和JWT哪个更好
+
+* session是统一存储用户信息，因此可以快速封禁其中的用户
+* session存储在进程中，因为存在硬盘disk中不够快，所以存在进程中数据不共享问题，这时候需要引用第三方缓存**redis**
+* session默认有跨域限制
+* JWT所有信息都在token中，所以不占用服务器内存
+* JWT多进程多服务器不受影响，因为都是浏览器把所有信息带给他的
+* JWT没有跨域限制
+* JWT信息存储在客户端，无法快速封禁其中的用户（建立黑名单来封禁）
+* 万一服务器密钥泄漏，则用户信息全部丢失
+
+##### 答案
+
+* 如果有严格管理用户信息的要求，则使用session
+* 如没有特殊要求，则使用JWT（创业初期的网站使用JWT，减少很多服务端的存储和成本）
+
   #### 如何实现SSO单点登录
   #### HTTP协议和UDP协议有什么区别
   #### HTTP协议1.0和1.1和2.0有什么区别
