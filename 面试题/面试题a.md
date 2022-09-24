@@ -711,8 +711,63 @@ if (cluster.isMaster) {
   * 例如：`chrome://dino/`可以玩一个chrome小游戏
 
   #### requestIdleCallback和requestAnimationFrame有什么区别
+
+* requestAnimationFrame每次渲染完都会执行，高优
+* requestIdleCallback空闲时才会执行，低优
+* 两者都是宏任务，都是要等待dom渲染完后才执行
+
   #### Vue每个生命周期都做了什么
+
+* beforeCreate
+  * 创建一个空白的Vue实例，data、methods还没初始化，不能使用
+* created
+  * Vue实例初始化完成，完成了响应式绑定
+  * data和methods初始化完成，可调用
+  * 尚未开始渲染模版
+* beforeMount
+  * 编译模版，调用render生成vdom
+  * 还没开始渲染DOM
+* mounted
+  * 完成DOM的渲染
+  * 组件创建完成
+  * 开始由**创建阶段** 进入**运行阶段**
+  * Ajax适合在这个位置发起，虽然也可以在created发起，但是created到mounted时间间隔很短，可能就10ms，这里可以拿到比较多的东西，放在created还会导致并行，如果使用`async created()`可能出现mounted已经执行结束了，created才执行的问题，不好追述
+* beforeUpdate
+  * data发生变化，准备更新DOM（只是准备，没有更新）
+* updated
+  * data发生变化，DOM更新完成
+  * 不要在updated修改data，可能会导致死循环
+* beforeUnmount
+  * 组件进入销毁阶段（尚未销毁，还能使用）
+  * 可移除解绑一些全局事件，自定义事件
+* unmounted
+  * 组件被销毁了
+  * 所有子组件也被销毁了
+* onActivated：缓存组件被激活（进入页面）
+* onDeActivated: 缓存组件被隐藏（离开页面）
+
+#### Vue在什么时候操作DOM比较合适
+
+* mounted和updated都不能保证子组件全部挂载完成
+* 使用`$nextTick`渲染DOM
+
+```js
+mounted() {
+  this.$nextTick(()=>{
+    // 仅在整个视图都被渲染完成之后才会执行的代码
+  })
+}
+```
+
+#### Vue3的Composition API生命周期有何区别
+
+* 使用`setup`代替了beforeCreate和created
+* 使用Hocks函数形式，例如mounted改为了onMounted()
+
   #### Vue2和Vue3和React三者的diff 算法有什么区别
+
+
+
   #### Vue-router的MemoryHistory是什么
 ## 四、知识广度 - 从前端到全栈
 
