@@ -1035,16 +1035,96 @@ if (top.location.hostname !== self.location.hostname){
 * 预防：和xss类似，处理输入内容，替换特殊字符
 
   #### WebSocket和HTTP协议有什么区别
-  #### WebSocket和HTTP协议有什么区别-扩展-创建简易聊天室
+
+* Websocket: 
+  * 长连接，支持端对端通讯，可以由服务端发起，主要用于聊天室，消息通知，直播间讨论区，多人协同等
+  * 先要发起一个http请求，成功后再升级到websocket协议，再通讯（打开控制台ws栏，可以看到`Connection: Upgrade`, 状态吗101）
+* 区别：
+  * 协议名不一样：websocket是`ws://`，可以双端发起请求，而http是`http://`只能客户端发起
+  *  websocket没有跨域限制
+  * websocket通过`send`和`onmessage`通讯，http通过`req`和`res`
+  * 实际项目推荐使用`socket.io`，api比较简洁 
+
+* 聊天室的实际情况：
+  * 在服务端建立一个set，将每个ws实例add进去，当要send的时候遍历这个set，除了自己以外，其他的都send
+
   #### WebSocket和HTTP长轮询的区别
+
+* HTTP长轮询：客户端发起请求，服务端等待，不会立即返回（客户端不发消息，服务端就没返回）
+  * 注意处理timeout机制，timeout之后要重新发起请求
+* WebSocket：客户端发起请求，服务端也可以发起请求 （就算客户端不发消息，服务端也可以主动发消息）
+
   #### 从输入URL 到网页显示的完整过程
+
+* 网络请求
+
+  * DNS查询，获取到ip，然后建立TCP连接
+  * 浏览器发起HTTP请求
+  * 收到请求相应，得到HTML源代 码（字符串）
+
+* 解析（字符串->结构化数据）
+
+  > 解析过程会继续请求静态资源，如图片，css，js等（如果有强缓存【200 from memory cache 】，则不发请求）
+  >
+  > 解析过程很复杂，不知到css是来自<style>还是<link>，js是内嵌还是外链，img是base64还是外链，所以不用深究
+
+  * HTML构建DOM树
+  * CSS构建style tree
+  * 两者结合形成render树
+
+* 渲染（render tree绘制到页面）
+
+  * 计算各个dom的尺寸和定位，最后绘制到页面
+  * 遇到js可能会执行
+  * 异步css和img可能会触发重新渲染
+
   #### 网页重绘repaint和重排reflow有什么区别
-  #### 如何实现网页多标签tab通讯
+
+* 重绘：
+  * 元素的外观改变，如颜色，背景色
+  * 元素的尺寸，定位不变，不会影响其他元素的位置
+* 重排：
+  * 重新计算尺寸和布局，可能会影响其他元素的位置
+* 减少重排
+  * 集中修改样式，一次修改比多次修改效果更好
+  * 修改前先设置display:none,脱离文档流
+  * 利用BFC特性，不影响其他元素位置
+  * 频繁触发（resize scroll）使用防抖和节流
+* BFC触发的条件
+  * 根结点<html>
+  * `float: left/right`
+  * `overflow: auto/scroll/hidden`
+  * `display: inline-block/table/table-cell`
+  * `display: flex/grid`的直接子元素
+  * `position: absolute/fixed`
+
+  #### 如何实现网页多标签tab通讯（浏览器开了多个tab，要通讯）
+
+* 使用websocket通讯，成本大
+* 同域的网页，可以使用localstorage通讯（可以使用`window.addEventListener('storage', e=>{console.log(e)})`）
+* 使用**SharedWorker**通讯
+  * shardworker是webworker的一种，可单独开启一个进程用于同域页面的通讯
+
   #### 如何实现网页和iframe之间的通讯
+
+* 使用postMessage通讯
+* 注意跨域限制和判断
+
+```js
+// index.html
+const domain = 不限制? '*' ：'http://123.com'
+window.iframe1.contentWindow.postMessage('信息',domain)
+window.addEventListener('message', callback)
+
+// iframe.html
+ window.parant.postMessage('子页面信息', '*')
+window.addEventListener('message', callback)
+```
+
+
+
   #### 请描述koa2的洋葱圈模型
   #### 扩展：后端有了 java php python ，为何还需要 nodejs ？
-  #### 重点及注意事项总结
-
 ## 五、实际工作经验 - 是否做过真实项目
 
   #### H5页面如何进行首屏优化
