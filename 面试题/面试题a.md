@@ -957,8 +957,83 @@ mounted() {
 * async：异步，意味着遇到js时，并行下载这个js，等待这个js下载结束后，不管html有没有解析结束，都要立刻执行这个js，
 
   #### prefetch和dns-prefetch分别是什么
-  #### 前端攻击手段有哪些，该如何预防-part1
-  #### 前端攻击手段有哪些，该如何预防-part2
+
+* dns-prefetch: DNS预查询，和preconnect有关
+  * preconnect：DNS预连接
+  * 提前查询ip后提前连接，打开的速度更快一些
+  * 为什么要做DNS查询？
+    * ip是一串数字，不好记，如1234.567.89.23这种
+    * ip不是不变的，例如百度，国内外，不同省份可能真实连接的ip不同，因为是一个集群，而且不同时间可能ip也不同
+* prefetch：资源预获取，指资源在未来页面使用，空闲时加载，和preload有关
+  * preload：资源在当前页面使用，要优先加载
+
+```html
+<head>
+	<!-- preload 当前页面使用，优先加载-->
+	<link rel="preload" href="style.css" as="style">
+  <link rel="preload" href="main.js" as="script">
+  
+	<!-- prefetch 未来页面使用，空闲时加载-->
+	<link rel="prefetch" href="other.js" as="script">
+  
+ 	<!-- dns-prefetch: DNS预查询 --> 
+  <link rel="dns-prefetch" href="https://fonts.gsta atic.com/"/>
+  <!-- preconnect: DNS预连接 --> 
+	<link rel="preconnect" h ref="https://fonts.gstati c.com/" crossorigin>
+  
+	<!-- 引用 css -->
+	<link rel="stylesheet" href="style.css">
+</head>
+```
+
+
+
+  #### 前端攻击手段有哪些，该如何预防
+
+##### XSS（跨站脚本攻击）
+
+* 手段：黑客将js插入到网页中，渲染时执行js代码
+* 预防：特殊字符替换，例如前端的富文本中将左右尖括号替换成实体字符`&lt;`和`&gt;`
+* Vue的{{}}会自动防范xss攻击，不需要单独处理，除非你用v-html
+* React的{}也一样，除非你用dangeriouslyInnerHTML
+
+##### CSRF（跨站请求伪造）
+
+* 手段：黑客诱导用户去访问另一个网站的接口，伪造请求
+* CSRF 详细过程：例如打开了邮箱里的广告
+  * 用户登录了A网站，有了cookie
+  * 黑客诱导用户到B网站，并发起A网站的请求
+  * A网站的API发现有cookie，认为是用户自己操作的
+* 预防：严格的跨域限制+验证码机制
+  * 服务端加限制，判断referer请求来源
+  * 为cookie设置samesite，禁止跨域传递cookie
+  * 关键接口加短信验证码
+
+##### 点击劫持
+
+* 手段：诱导界面上蒙一个透明的iframe，诱导用户点击
+* 场景：用户登陆的A网站，存起来的cookie，之后打开B网站，这个B网站上面蒙了一层透明的A网站，写着免费领取优惠券之类的信息诱导用户点击，此时真正点击的是A网站的按钮，由于用户已经登录过A网站，所以可以成功
+* 预防：让iframe不能跨域加载
+  * 检查上层是不是自己的网站
+  * 在response header中设置`X-Frame-Options: sameorign`,设置了这个后，这个网页不能被其他网站以iframe形式加载
+
+```js
+if (top.location.hostname !== self.location.hostname){
+	alert("您正在访问不安全的页面，即将跳转到安全页面!")
+	top.location.href = self.location.href 
+}
+```
+
+##### DDos（分布书拒绝服务）
+
+* 手段：分布式，大规模的流量访问，使服务器瘫痪【和前端有点不相干了】
+* 预防：软件层不好做，需要硬件预防（如：阿里云WAF网站防火墙）
+
+##### SQL注入
+
+* 手段：和xss类似，用户提交内容写入SQL语句，破坏数据库
+* 预防：和xss类似，处理输入内容，替换特殊字符
+
   #### WebSocket和HTTP协议有什么区别
   #### WebSocket和HTTP协议有什么区别-扩展-创建简易聊天室
   #### WebSocket和HTTP长轮询的区别
