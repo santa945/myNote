@@ -12,7 +12,7 @@
 
 ## 二、前端基础知识
 
-  #### Ajax-Fetch-Axios三者有什么区别
+#### Ajax-Fetch-Axios三者有什么区别
 
 ```markdown
 三者都用于网络请求，但是不同维度
@@ -43,7 +43,7 @@ function ajax2(url) {
 
 
 
-  #### 防抖和节流有什么区别，分别用于什么场景-防抖
+#### 防抖和节流有什么区别，分别用于什么场景-防抖
 
 * 防抖：控制函数触发的时机，当停顿达到设定的时间时，才触发一次，和坐电梯一样
   * 例如，一个搜索输入框，等输入停止之后，再触发搜索
@@ -79,7 +79,7 @@ const throttle = (fn, delay = 100) => {
 }
 ```
 
-  #### px/%/em/rem/vw-vh有什么区别
+#### px/%/em/rem/vw-vh有什么区别
 
 ```markdown
 * px: 绝对单位，其他的都是相对单位
@@ -99,7 +99,7 @@ const throttle = (fn, delay = 100) => {
 
 
 
-  #### 什么时候不能使用箭头函数
+#### 什么时候不能使用箭头函数
 
 ```markdown
 * 没有`arguments`;
@@ -171,7 +171,7 @@ console.log(joy); // 报错，Student is not a constructor
 
 
 
-  #### 请描述 TCP 三次握手和四次挥手
+#### 请描述 TCP 三次握手和四次挥手
 
 ```markdown
 * 三次握手- 建立连接
@@ -188,7 +188,7 @@ console.log(joy); // 报错，Student is not a constructor
 
 
 
-  #### for-in和for-of有什么区别
+#### for-in和for-of有什么区别
 
 * `for in`用于**可枚举**的数据，如对象，数组，字符串（属性特性中`enumber`为true）
   * `Object.getOwnPropertyDescriptors({a:1})`可以看到a的`enumerable`为true
@@ -244,7 +244,7 @@ for (const val of obj) {
 
 
 
-  #### for-await-of有什么作用
+#### for-await-of有什么作用
 
 * 相当于`promise.all`的效果
 * 用在promise有很多的情况，要打印出值而不是promise对象
@@ -286,14 +286,14 @@ const createPromise = (val) => {
 
 
 
-  #### offsetHeight / scrollHeight / clientHeight有什么区别
+#### offsetHeight / scrollHeight / clientHeight有什么区别
 
 * 计算规则
   * **offsetHeight/offsetWidth**: border + padding+content
   * **clientHeight/clientWidth**: padding+content
   * **scrollHeight/scrollWidth**: padding+实际内容尺寸(子元素更大时就是子元素尺寸)
 
-  #### HTMLCollection和NodeList有什么区别
+#### HTMLCollection和NodeList有什么区别
 
 * `HTMLCollection`是Element的集合，`NodeList`是Node的集合
 * 获取`Node`和获取`Element`返回结果可能不一样，如`dom.children`与`dom.childNodes`
@@ -338,14 +338,14 @@ const createPromise = (val) => {
 </body>
 ```
 
-  #### Vue中computed和watch有什么区别
+#### Vue中computed和watch有什么区别
 
 * computed是根据data或者computed中的其他属性来通过计算返回一个新的数据（多个数据影响一个）
 * watch是监听现有数据的变化，来判断要做什么事（一个数据影响多个）
 * computed和method相比，computed是有缓存的，影响因素不变就不会重新计算，method是触发就重新计算
 
 
-  #### Vue组件通讯有几种方式
+#### Vue组件通讯有几种方式
 
 * props/$emits自定义事件
 * $attrs/$parents
@@ -355,13 +355,13 @@ const createPromise = (val) => {
 * Vuex
 
 
-  #### Vuex中action和mutation有什么区别
+#### Vuex中action和mutation有什么区别
 
 * Mutation: 原子操作，必须是同步的代码
 * Action: 可包含异步操作，可以包含多个mutation
 
 
-  #### JS严格模式有什么特点
+#### JS严格模式有什么特点
 
 * 全局变量必须先声明
 * 禁止使用with（会变得难以阅读）
@@ -389,7 +389,7 @@ function fn(x, x, y) { // Duplicate parameter name not allowed in this context
 fn(10, 10, 20)
 ```
 
-  #### HTTP跨域时为何要发送options请求
+#### HTTP跨域时为何要发送options请求
 
 * options请求，是跨域请求之前的预检查，用于询问支持的请求类型
 * 浏览器自行发起的，无需我们干预
@@ -397,7 +397,7 @@ fn(10, 10, 20)
 
 ## 三、知识深度 - 原理和源码
 
-  #### JS内存垃圾回收用什么算法
+#### JS内存垃圾回收用什么算法
 
 > 什么是垃圾回收？函数执行完了后，那些用不到的对象和数据
 >
@@ -433,7 +433,7 @@ function fn2() {
 fn2();// 执行完后从window开始找，a和b两个变量被消除了，所以跟在后面的{}也找不到了
 ```
 
-  #### JS闭包是内存泄漏吗？
+#### JS闭包是内存泄漏吗？
 
 * 闭包不是内存泄漏，因为闭包里面的数据是要用的，属于预期数据，非预期的数据(不需要用的)才算内存泄露
 * 闭包里的数据不能被回收（但不代表它是内存泄露，只不过占内存而已）
@@ -494,7 +494,7 @@ fn2();// 执行完后从window开始找，a和b两个变量被消除了，所以
 
 
 
-  #### WeakMap和WeakSet
+#### WeakMap和WeakSet
 
 * 弱引用的关系，我引用你，但是如果你销毁了，我也一样找不到
 * 不影响垃圾回收，只要外部的引用消失，所对应的键值对就会自动被垃圾回收清除
@@ -523,7 +523,7 @@ console.log(wMap.get({ x: 100 })); // undefined, 这里的{ x: 100 }已经不是
 
 
 
-  #### 浏览器和nodejs事件循环（Event Loop）有什么区别？
+#### 浏览器和nodejs事件循环（Event Loop）有什么区别？
 
 > 两者基本上是相同的，只不过nodejs给宏任务和微任务分了不同的类型和优先级，而浏览器的宏任务微任务没有优先级
 
@@ -562,13 +562,13 @@ console.info('end') // 2
 
 
 
-  #### 虚拟DOM（vdom）真的很快吗
+#### 虚拟DOM（vdom）真的很快吗
 
 * vdom并不快，JS直接操作 DOM才是最快的 
 * 但“数据驱动视图”要有合适的技术方案，不能全部DOM重建，diff算法会部分dom重建，在整个开发链条来说很快
 * vdom就是目前最合适的技术方案(并不是因为它快，而是合适)
 
-  #### 遍历一个数组用for和forEach哪个更快(JS底层原理问题)
+#### 遍历一个数组用for和forEach哪个更快(JS底层原理问题)
 
 * for会比forEach更快
 * forEach每次都要创建一个函数来调用，而for不会创建函数
@@ -593,9 +593,9 @@ arr.forEach(() => n2++) I
 console.timeEnd("forEach)//15.1ms
 ```
 
-  #### nodejs如何开启多进程，进程如何通讯
+#### nodejs如何开启多进程，进程如何通讯
 
-  ##### 进程和线程的区别
+##### 进程和线程的区别
 
 * 进程(process)，OS进行**资源分配**和调度的最小单位，有独立内存空间（计算机会分配一个堆）
   * 例如：一个抖音的进程，一个微信的进程，两个进程的内存中的堆和栈不共用
@@ -695,7 +695,7 @@ if (cluster.isMaster) {
 
 
 
-  #### 请描述js-bridge的实现原理
+#### 请描述js-bridge的实现原理
 
 ##### 什么是 JS Bridge
 
@@ -710,15 +710,16 @@ if (cluster.isMaster) {
   * 例如：`chrome://version/` 可以直接查看版本
   * 例如：`chrome://dino/`可以玩一个chrome小游戏
 
-  #### requestIdleCallback和requestAnimationFrame有什么区别
+#### requestIdleCallback和requestAnimationFrame有什么区别
 
 * requestAnimationFrame每次渲染完都会执行，高优
 * requestIdleCallback空闲时才会执行，低优
 * 两者都是宏任务，都是要等待dom渲染完后才执行
 
-  #### Vue每个生命周期都做了什么
+#### Vue每个生命周期都做了什么
 
 * beforeCreate
+  
   * 创建一个空白的Vue实例，data、methods还没初始化，不能使用
 * created
   * Vue实例初始化完成，完成了响应式绑定
@@ -733,6 +734,7 @@ if (cluster.isMaster) {
   * 开始由**创建阶段** 进入**运行阶段**
   * Ajax适合在这个位置发起，虽然也可以在created发起，但是created到mounted时间间隔很短，可能就10ms，这里可以拿到比较多的东西，放在created还会导致并行，如果使用`async created()`可能出现mounted已经执行结束了，created才执行的问题，不好追述
 * beforeUpdate
+  
   * data发生变化，准备更新DOM（只是准备，没有更新）
 * updated
   * data发生变化，DOM更新完成
@@ -764,7 +766,7 @@ mounted() {
 * 使用`setup`代替了beforeCreate和created
 * 使用Hocks函数形式，例如mounted改为了onMounted()
 
-  #### Vue2和Vue3和React三者的diff 算法有什么区别
+#### Vue2和Vue3和React三者的diff 算法有什么区别
 
 * React diff：仅右移
 * Vue2 diff：双端比较（头头，头尾，尾尾，尾头，四个指针比较，然后不断往中间移动直到相遇）
@@ -776,7 +778,7 @@ mounted() {
 * 匹配了key，只移动元素，性能较好
 * 未匹配key，则要删除重建，性能较差
 
-  #### Vue-router的MemoryHistory是什么
+#### Vue-router的MemoryHistory是什么
 
 ##### Vue-router是三种模式
 
@@ -796,7 +798,7 @@ mounted() {
 
 ## 四、知识广度 - 从前端到全栈
 
-  #### 移动端H5点击Click有300ms延迟，该如何解决
+#### 移动端H5点击Click有300ms延迟，该如何解决
 
 > 背景：用手机打开网页，发现文字太小了，可以双击放大，这时候点击第一次的时候不执行，等300ms之内如果有第二次点击，证明这是一次双击
 
@@ -815,7 +817,7 @@ mounted() {
 
    
 
-  #### Retina 屏幕的 1px 像素，如何实现
+#### Retina 屏幕的 1px 像素，如何实现
 
 > https://blog.csdn.net/sisteran/article/details/119529729
 
@@ -829,7 +831,7 @@ mounted() {
 
 
 
-  #### HTTP请求中token和cookie有什么区别
+#### HTTP请求中token和cookie有什么区别
 
 ##### cookie
 
@@ -840,7 +842,7 @@ mounted() {
   * 传递：8081端口的网页请求8083的接口时，不会携带cookie给服务端（解决方法：前端在axios配置**withCredentails**，后端也需要配置）
 * 现代浏览器开始禁止第三方js设置cookie（内嵌广告a.com如果可以设置cookie，那下次用户登陆a.com就可以用cookie分析用户习惯了）
 
-  ##### session
+##### session
 
 * 存储在服务端，存储用户详细信息，和cookie信息一一对应
 * cookie+seccion是常见的登录验证解决方案
@@ -856,7 +858,7 @@ mounted() {
 * cookie是HTTP标准，有跨域限制，需要配合session使用，cookie只存了一个key，体积小，真实信息存在服务端的session里
 * token无标准，无跨域限制，包含用户的全部信息，直接发给服务端全部信息，由服务端解密
 
-  #### session和JWT哪个更好
+#### session和JWT哪个更好
 
 * session是统一存储用户信息，因此可以快速封禁其中的用户
 * session存储在进程中，因为存在硬盘disk中不够快，所以存在进程中数据不共享问题，这时候需要引用第三方缓存**redis**
@@ -872,7 +874,7 @@ mounted() {
 * 如果有严格管理用户信息的要求，则使用session
 * 如没有特殊要求，则使用JWT（创业初期的网站使用JWT，减少很多服务端的存储和成本）
 
-  #### 如何实现SSO单点登录
+#### 如何实现SSO单点登录
 
 ##### cookie共享
 
@@ -898,7 +900,7 @@ mounted() {
   * 再次访问，此时携带token访问a.com，则a.com拿着token去询问微信，是否登录
   * 如上：和sso相似
 
-  #### HTTP协议和UDP协议有什么区别
+#### HTTP协议和UDP协议有什么区别
 
 * HTTP协议在应用层
 * TCP和UDP协议在传输层
@@ -906,7 +908,7 @@ mounted() {
 * UDP协议无传输，无断开，不稳定传输，但效率高（如视频会议，语音通话，不管对面能不能收到，会不会断开，有时候不稳定就断开了）
 * UDP协议对于前端这种以js为主的来说，不常见，视频会议，语音通话这种通常需要native
 
-  #### HTTP协议1.0和1.1和2.0有什么区别
+#### HTTP协议1.0和1.1和2.0有什么区别
 
 * HTTP1.0
   * 最基础的HTTP协议
@@ -923,7 +925,7 @@ mounted() {
   * 多路复用，一次TCP连接可以支持多个HTTP**并发**请求
   * 服务端推送（用得少，基本上用的是websoket）
 
-  #### 什么是HTTPS中间人攻击，如何预防
+#### 什么是HTTPS中间人攻击，如何预防
 ##### 背景：
 
 * 对称加密：有个密钥，加密和解密都是使用同一个密钥，那么密钥存在服务端，需要传递给客户端，不安全也没意义
@@ -949,14 +951,14 @@ mounted() {
 * 如果证书是第三方的不正规的证书，浏览器会有https警告，可以选择通过或者不通过，当然，黑客攻击也会报警告，这就是人为日常维护中不能通过这些
 * 所以预防的方法通常是，服务端使用正规的证书，客户端发现https警告时不让通过不去访问
 
-  #### script标签的defer和async有什么区别
+#### script标签的defer和async有什么区别
 
 * 正常情况下：遇到<script>标签，页面停止解析，等待js下载结束，执行这个js，执行结束后再接着解析html
 
 * defer：延迟，意味着遇到js时，并行下载这个js，等待html解析结束后，在执行这个js（效果相当于把<script>都写在body后面，但是更快）
 * async：异步，意味着遇到js时，并行下载这个js，等待这个js下载结束后，不管html有没有解析结束，都要立刻执行这个js，
 
-  #### prefetch和dns-prefetch分别是什么
+#### prefetch和dns-prefetch分别是什么
 
 * dns-prefetch: DNS预查询，和preconnect有关
   * preconnect：DNS预连接
@@ -965,6 +967,7 @@ mounted() {
     * ip是一串数字，不好记，如1234.567.89.23这种
     * ip不是不变的，例如百度，国内外，不同省份可能真实连接的ip不同，因为是一个集群，而且不同时间可能ip也不同
 * prefetch：资源预获取，指资源在未来页面使用，空闲时加载，和preload有关
+  
   * preload：资源在当前页面使用，要优先加载
 
 ```html
@@ -988,7 +991,7 @@ mounted() {
 
 
 
-  #### 前端攻击手段有哪些，该如何预防
+#### 前端攻击手段有哪些，该如何预防
 
 ##### XSS（跨站脚本攻击）
 
@@ -1034,7 +1037,7 @@ if (top.location.hostname !== self.location.hostname){
 * 手段：和xss类似，用户提交内容写入SQL语句，破坏数据库
 * 预防：和xss类似，处理输入内容，替换特殊字符
 
-  #### WebSocket和HTTP协议有什么区别
+#### WebSocket和HTTP协议有什么区别
 
 * Websocket: 
   * 长连接，支持端对端通讯，可以由服务端发起，主要用于聊天室，消息通知，直播间讨论区，多人协同等
@@ -1048,13 +1051,14 @@ if (top.location.hostname !== self.location.hostname){
 * 聊天室的实际情况：
   * 在服务端建立一个set，将每个ws实例add进去，当要send的时候遍历这个set，除了自己以外，其他的都send
 
-  #### WebSocket和HTTP长轮询的区别
+#### WebSocket和HTTP长轮询的区别
 
 * HTTP长轮询：客户端发起请求，服务端等待，不会立即返回（客户端不发消息，服务端就没返回）
+  
   * 注意处理timeout机制，timeout之后要重新发起请求
 * WebSocket：客户端发起请求，服务端也可以发起请求 （就算客户端不发消息，服务端也可以主动发消息）
 
-  #### 从输入URL 到网页显示的完整过程
+#### 从输入URL 到网页显示的完整过程
 
 * 网络请求
 
@@ -1078,12 +1082,13 @@ if (top.location.hostname !== self.location.hostname){
   * 遇到js可能会执行
   * 异步css和img可能会触发重新渲染
 
-  #### 网页重绘repaint和重排reflow有什么区别
+#### 网页重绘repaint和重排reflow有什么区别
 
 * 重绘：
   * 元素的外观改变，如颜色，背景色
   * 元素的尺寸，定位不变，不会影响其他元素的位置
 * 重排：
+  
   * 重新计算尺寸和布局，可能会影响其他元素的位置
 * 减少重排
   * 集中修改样式，一次修改比多次修改效果更好
@@ -1098,14 +1103,14 @@ if (top.location.hostname !== self.location.hostname){
   * `display: flex/grid`的直接子元素
   * `position: absolute/fixed`
 
-  #### 如何实现网页多标签tab通讯（浏览器开了多个tab，要通讯）
+#### 如何实现网页多标签tab通讯（浏览器开了多个tab，要通讯）
 
 * 使用websocket通讯，成本大
 * 同域的网页，可以使用localstorage通讯（可以使用`window.addEventListener('storage', e=>{console.log(e)})`）
 * 使用**SharedWorker**通讯
   * shardworker是webworker的一种，可单独开启一个进程用于同域页面的通讯
 
-  #### 如何实现网页和iframe之间的通讯
+#### 如何实现网页和iframe之间的通讯
 
 * 使用postMessage通讯
 * 注意跨域限制和判断
@@ -1121,87 +1126,99 @@ window.addEventListener('message', callback)
 window.addEventListener('message', callback)
 ```
 
+#### 请描述koa2的洋葱圈模型
 
+##### Koa1和Koa2的区别
 
-  #### 请描述koa2的洋葱圈模型
-  #### 扩展：后端有了 java php python ，为何还需要 nodejs ？
-## 五、实际工作经验 - 是否做过真实项目
+* Koa1是使用generator、yield的模式。
+* Koa2使用的是async/await + Promise的模式。
 
-  #### H5页面如何进行首屏优化
-  #### 后端一次性返回10w条数据，你该如何渲染
-  #### 扩展：文字超出省略
-  #### 前端常用的设计模式和使用场景
-  #### 观察者模式和发布订阅模式的区别
-  #### 在实际工作中，你对Vue做过哪些优化
-  #### 你在使用Vue过程中遇到过哪些坑
-  #### 在实际工作中，你对React做过哪些优化-上集
-  #### 在实际工作中，你对React做过哪些优化-下集
-  #### 你在使用React时遇到过哪些坑
-  #### 如何统一监听Vue组件报错
-  #### 如何统一监听React组件报错
-  #### 如果一个H5很慢，如何排查性能问题-通过Chrome Performance分析
-  #### 如果一个H5很慢，如何排查性能问题-使用lighthouse分析
-  #### 工作中遇到过哪些项目难点，是如何解决的
-  #### 扩展：处理沟通冲突
+##### 什么是洋葱模型
+
+* Koa的洋葱模型是以next()函数为分割点，先由外到内执行Request的逻辑，然后再由内到外执行Response的逻辑
+* 这里的request的逻辑，我们可以理解为是next之前的内容，response的逻辑是next函数之后的内容
+* 也可以说每一个中间件都有两次处理时机，核心原理主要是借助compose方法。
+
+##### 为什么要使用洋葱模型
+
+* 很多时候，在一个app里面有很多个中间件，有些中间件需要依赖其他中间件的结果，洋葱模型可以保证执行的顺序，如果没有洋葱模型，执行顺序可能出乎我们的预期。
+
+### 五、实际工作经验 - 是否做过真实项目
+#### H5页面如何进行首屏优化
+#### 后端一次性返回10w条数据，你该如何渲染
+#### 扩展：文字超出省略
+#### 前端常用的设计模式和使用场景
+#### 观察者模式和发布订阅模式的区别
+#### 在实际工作中，你对Vue做过哪些优化
+#### 你在使用Vue过程中遇到过哪些坑
+#### 在实际工作中，你对React做过哪些优化-上集
+#### 在实际工作中，你对React做过哪些优化-下集
+#### 你在使用React时遇到过哪些坑
+#### 如何统一监听Vue组件报错
+#### 如何统一监听React组件报错
+#### 如果一个H5很慢，如何排查性能问题-通过Chrome Performance分析
+#### 如果一个H5很慢，如何排查性能问题-使用lighthouse分析
+#### 工作中遇到过哪些项目难点，是如何解决的
+#### 扩展：处理沟通冲突
 ## 六、编写高质量代码 - 正确，完整，清晰，鲁棒
 
-  #### 手写一个JS函数，实现数组扁平化Array Flatten
-  #### 手写一个JS函数，实现数组深度扁平化
-  #### 手写一个getType函数，获取详细的数据类型
-  #### new一个对象的过程是什么，手写代码表示
-  #### 深度优先遍历一个DOM树
-  #### 广度优先遍历一个DOM树
-  #### 深度优先遍历可以不用递归吗
-  #### 手写一个LazyMan，实现sleep机制
-  #### 手写curry函数，实现函数柯里化
-  #### instanceof原理是什么，请写代码表示
-  #### 手写函数bind功能
-  #### 手写函数call和apply功能
-  #### 手写EventBus自定义事件-包括on和once
-  #### 手写EventBus自定义事件-on和once分开存储
-  #### 手写EventBus自定义事件-单元测试
-  #### 用JS实现一个LRU缓存-分析数据结构特点，使用Map
-  #### 用JS实现一个LRU缓存-代码演示和单元测试
-  #### 不用Map实现LRU缓存-分析问题，使用双向链表
-  #### 不用Map实现LRU缓存-代码演示
-  #### 手写JS深拷贝-考虑各种数据类型和循环引用
-  #### 扩展补充：根据一个 DOM 树，写出一个虚拟 DOM 对象
-  #### 重点及注意事项总结
+#### 手写一个JS函数，实现数组扁平化Array Flatten
+#### 手写一个JS函数，实现数组深度扁平化
+#### 手写一个getType函数，获取详细的数据类型
+#### new一个对象的过程是什么，手写代码表示
+#### 深度优先遍历一个DOM树
+#### 广度优先遍历一个DOM树
+#### 深度优先遍历可以不用递归吗
+#### 手写一个LazyMan，实现sleep机制
+#### 手写curry函数，实现函数柯里化
+#### instanceof原理是什么，请写代码表示
+#### 手写函数bind功能
+#### 手写函数call和apply功能
+#### 手写EventBus自定义事件-包括on和once
+#### 手写EventBus自定义事件-on和once分开存储
+#### 手写EventBus自定义事件-单元测试
+#### 用JS实现一个LRU缓存-分析数据结构特点，使用Map
+#### 用JS实现一个LRU缓存-代码演示和单元测试
+#### 不用Map实现LRU缓存-分析问题，使用双向链表
+#### 不用Map实现LRU缓存-代码演示
+#### 手写JS深拷贝-考虑各种数据类型和循环引用
+#### 扩展补充：根据一个 DOM 树，写出一个虚拟 DOM 对象
+#### 重点及注意事项总结
 
 ## 七、分析和解决问题的思路 - 可以独立解决问题
 
-  #### [1, 2, 3].map(parseInt)
-  #### 读代码-函数修改形参，能否影响实参？
-  #### 把一个数组转换为树
-  #### 把一个树转换为数组
-  #### 读代码-构造函数和原型的重名属性
-  #### 一道让人失眠的promise-then执行顺序问题
-  #### 读代码-React-setState经典面试题
-  #### React-setState是微任务还是宏任务
-  #### 读代码-对象和属性的连续赋值
-  #### 读代码-对象属性类型的问题
-  #### 扩展补充：解决问题的常见思路
-  #### 重点及注意事项总结
+#### [1, 2, 3].map(parseInt)
+#### 读代码-函数修改形参，能否影响实参？
+#### 把一个数组转换为树
+#### 把一个树转换为数组
+#### 读代码-构造函数和原型的重名属性
+#### 一道让人失眠的promise-then执行顺序问题
+#### 读代码-React-setState经典面试题
+#### React-setState是微任务还是宏任务
+#### 读代码-对象和属性的连续赋值
+#### 读代码-对象属性类型的问题
+#### 扩展补充：解决问题的常见思路
+#### 重点及注意事项总结
 
 ## 八、项目设计 - 能否成为项目负责人
 
-  #### 扩展：如果你是一个项目的前端技术负责人，你的主要职责是什么？
-  #### 如何设计一个前端统计SDK-分析功能范围
-  #### 如何设计一个前端统计SDK-代码结构演示
-  #### sourcemap有何作用，如何配置
-  #### SPA和MPA应该如何选择
-  #### 设计一个H5编辑器的数据模型和核心功能-错误答案展示
-  #### 扩展知识补充：何时应该使用 SSR ，何时不用？
-  #### 设计一个H5编辑器的数据模型和核心功能-演示正确答案
-  #### 设计一个“用户-角色-权限”的模型和功能
-  #### 简单描述hybrid模板的更新流程
-  #### 开发一个H5抽奖页，需要后端提供哪些接口
-  #### 如果你是前端技术负责人，将如何做技术选型
-  #### 设计实现一个H5图片懒加载SDK
-  #### 扩展知识补充：我们常说的 B 端和 C 端，有什么区别
+#### 扩展：如果你是一个项目的前端技术负责人，你的主要职责是什么？
+#### 如何设计一个前端统计SDK-分析功能范围
+#### 如何设计一个前端统计SDK-代码结构演示
+#### sourcemap有何作用，如何配置
+#### SPA和MPA应该如何选择
+#### 设计一个H5编辑器的数据模型和核心功能-错误答案展示
+#### 扩展知识补充：何时应该使用 SSR ，何时不用？
+#### 设计一个H5编辑器的数据模型和核心功能-演示正确答案
+#### 设计一个“用户-角色-权限”的模型和功能
+#### 简单描述hybrid模板的更新流程
+#### 开发一个H5抽奖页，需要后端提供哪些接口
+#### 如果你是前端技术负责人，将如何做技术选型
+#### 设计实现一个H5图片懒加载SDK
+#### 扩展知识补充：我们常说的 B 端和 C 端，有什么区别
 ## 九、软技能 - 沟通、总结和学习能力
 
-  #### 你是否看过“红宝书”-
-  #### 如何做Code-review，要考虑哪些内容
-  #### 如何学习一门新语言，需要考虑哪些方面
-  #### 你觉得自己还有哪些不足之处？
+#### 你是否看过“红宝书”-
+#### 如何做Code-review，要考虑哪些内容
+#### 如何学习一门新语言，需要考虑哪些方面
+#### 你觉得自己还有哪些不足之处？
